@@ -3,6 +3,7 @@ import numpy as np
 from config import shape_generation, set_pacemaker
 from visualizations import display_grid, plot_cells_and_signal
 from ca import CA
+import constants as c
 
 
 cells = shape_generation('cube')
@@ -10,6 +11,12 @@ voltage = set_pacemaker()
 
 # plot_cells_and_signal(cells, voltage)
 
-ca = CA(cells, voltage)
+c.a = 0.1  # makes signal last in cells longer when higher
+c.b = 0.25  # propagates signal faster when higher
 
-ca.run_and_save(fn='3d_cube.mp4', iterations=50)
+ca = CA(cells, voltage)
+ca.run(save=True, iterations=30)
+
+#TODO: Pulsing pacemaker
+#TODO: Signal gradient
+

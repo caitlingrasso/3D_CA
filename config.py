@@ -17,7 +17,7 @@ def shape_generation(option):
     if option == 'single_cell':
         cells[center, center, center] = 1
     elif option == 'cube':
-        cells[third:c.GRID_SIZE-third, third:c.GRID_SIZE-third, third:c.GRID_SIZE-third] = 1
+        cells[eighth:c.GRID_SIZE-eighth, eighth:c.GRID_SIZE-eighth, eighth:c.GRID_SIZE-eighth] = 1
     return cells
 
 # ------------------------------------------------
