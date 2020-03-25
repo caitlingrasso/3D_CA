@@ -41,7 +41,7 @@ class CA:
                 cell_face_color = [1, 1, 1, 0.01]
             else:
                 cell_face_color = [1, 1, 1]
-            cell_edge_color = [0, 0, 0, 0.25]
+            cell_edge_color = None #[0, 0, 0, 0.25]
 
             moviewriter.setup(fig, fn, dpi=100)
 
@@ -51,13 +51,15 @@ class CA:
                 for x in range(self.voltage.shape[0]):
                     for y in range(self.voltage.shape[1]):
                         for z in range(self.voltage.shape[2]):
-                            voltage_face_colors[x, y, z] = [0, 0, 0, self.voltage[x, y, z] / 255]
+                            alpha = self.voltage[x, y, z] / 255
+                            if alpha > 1:
+                                alpha = 1
+                            voltage_face_colors[x, y, z] = [0, 0, 0, alpha]
                 ax.voxels(self.voltage, facecolors=voltage_face_colors)
                 moviewriter.grab_frame()
                 self.update_voltage()
                 plt.cla()
                 plt.axis(axis)
-
             moviewriter.grab_frame()
             moviewriter.finish()
             plt.close(fig)

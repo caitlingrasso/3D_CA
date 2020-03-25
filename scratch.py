@@ -13,11 +13,10 @@ voltage = set_pacemaker()
 # exit()
 
 c.a = 0.1  # makes signal last in cells longer when higher
-c.b = 0.25  # propagates signal faster when higher
+c.b = 0.1  # propagates signal faster when higher
 
 ca = CA(cells, voltage)
-ca.run(save=True, iterations=30, fn='temp_opaque.mp4', transparent=False)
+ca.run(save=True, iterations=50, fn='cube.mp4', transparent=False)
 
-#TODO: Signal gradient
 #TODO: Pulsing pacemaker
 
