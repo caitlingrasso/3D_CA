@@ -47,7 +47,12 @@ class CA:
 
             for _ in range(iterations):
                 ax.voxels(self.cells, facecolors=cell_face_color, edgecolor=cell_edge_color)
-                ax.voxels(self.voltage, facecolors='k', edgecolor='k')
+                voltage_face_colors = np.empty((constants.GRID_SIZE, constants.GRID_SIZE, constants.GRID_SIZE, 4))
+                for x in range(self.voltage.shape[0]):
+                    for y in range(self.voltage.shape[1]):
+                        for z in range(self.voltage.shape[2]):
+                            voltage_face_colors[x, y, z] = [0, 0, 0, self.voltage[x, y, z] / 255]
+                ax.voxels(self.voltage, facecolors=voltage_face_colors)
                 moviewriter.grab_frame()
                 self.update_voltage()
                 plt.cla()

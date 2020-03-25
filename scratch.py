@@ -9,14 +9,15 @@ import constants as c
 cells = shape_generation('cube')
 voltage = set_pacemaker()
 
-# plot_cells_and_signal(cells, voltage)
+# plot_cells_and_signal(cells, voltage, transparent=True)
+# exit()
 
 c.a = 0.1  # makes signal last in cells longer when higher
 c.b = 0.25  # propagates signal faster when higher
 
 ca = CA(cells, voltage)
-ca.run(save=True, iterations=30)
+ca.run(save=True, iterations=30, fn='temp_opaque.mp4', transparent=False)
 
-#TODO: Pulsing pacemaker
 #TODO: Signal gradient
+#TODO: Pulsing pacemaker
 

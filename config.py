@@ -28,7 +28,7 @@ def set_pacemaker():
     # initial voltage grid = voltage starts at 255 in center cell
     volt = np.zeros((c.GRID_SIZE, c.GRID_SIZE, c.GRID_SIZE), dtype=int)
     volt[center, center, center] = 255
-    # volt[center+1, center, center] = 100
+    volt[center+1, center, center] = 100
     return volt
 
 
