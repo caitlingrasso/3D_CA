@@ -7,34 +7,36 @@ import constants
 from ca import CA
 from network import Network
 
-def display_grid(grid: np.ndarray, title: str = '', show=True):
+def plot_voxels(a):
     fig = plt.figure()
     ax = fig.gca(projection='3d')
-    ax.set_title(title, fontsize=16)
-    ax.voxels(grid, facecolors='k', edgecolor='k')
-    if show:
-        plt.show()
+    plt.axis('off')
+    cmap = plt.get_cmap("binary")
+    norm = plt.Normalize(a.min(), a.max())
+    ax.voxels(np.ones_like(a), facecolors=cmap(norm(a)), edgecolor=None)
+    plt.show()
 
-def plot_cells_and_signal(cells, voltage, title='', axis='off', transparent=True):
+def plot_body_and_voltage(body, voltage, title='', axis='off', transparent=True):
     fig = plt.figure()
     ax = fig.gca(projection='3d')
     ax.set_title(title, fontsize=16)
     plt.axis(axis)
-    if transparent:
-        cell_face_color = [1, 1, 1, 0.01]
-    else:
-        cell_face_color = [1, 1, 1]
-    cell_edge_color = None #[0, 0, 0, 0.05]
 
-    voltage_face_colors = np.empty((constants.GRID_SIZE,constants.GRID_SIZE,constants.GRID_SIZE, 4))
-    for x in range(voltage.shape[0]):
-        for y in range(voltage.shape[1]):
-            for z in range(voltage.shape[2]):
-                alpha = voltage[x, y, z] / 255
-                if alpha > 1:
-                    alpha = 1
-                voltage_face_colors[x,y,z] = [0, 0, 0, alpha]
+    body_face_colors = np.empty((constants.GRID_SIZE, constants.GRID_SIZE, constants.GRID_SIZE, 4))
+    norm = plt.Normalize(body.min(), body.max())
+    alpha = norm(body)
+    for x in range(body.shape[0]):
+        for y in range(body.shape[1]):
+            for z in range(body.shape[2]):
+                body_face_colors[x, y, z] = [1, 1, 1, alpha[x, y, z]]
+    ax.voxels(body, facecolors=body_face_colors)
 
-    ax.voxels(cells, facecolors=cell_face_color, edgecolor=cell_edge_color)
+    voltage_face_colors = np.empty((constants.GRID_SIZE, constants.GRID_SIZE, constants.GRID_SIZE, 4))
+    norm = plt.Normalize(voltage.min(), voltage.max())
+    alpha = norm(voltage)
+    for x in range(body.shape[0]):
+        for y in range(body.shape[1]):
+            for z in range(body.shape[2]):
+                voltage_face_colors[x, y, z] = [0, 0, 0, alpha[x,y,z]]
     ax.voxels(voltage, facecolors=voltage_face_colors)
     plt.show()
