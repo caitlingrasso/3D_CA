@@ -5,7 +5,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 import constants
 from ca import CA
-from network import Network
+# from network import Network
 
 def plot_voxels(a):
     fig = plt.figure()
