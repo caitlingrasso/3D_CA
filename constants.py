@@ -1,12 +1,8 @@
-GRID_SIZE = 9
-CA_ITER = 50
+GRID_SIZE = 21
+CA_ITER = 250
 
 pulse_time = 10  # pulse every 10 iteration
 
-max_signal = 110  # how far a trail can diffuse
-refactory_time = max_signal
-
-# Diffusion coefficients
-a = 0.5
-b = 0.0625
+max_signal = 25  # how far a trail can diffuse
+refactory_time = max_signal  # once a cell reaches max_signal it is immediately active again (max_signal + 5... refactory period of 5 before it can activate again)
 

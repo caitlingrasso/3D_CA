@@ -42,8 +42,8 @@ def sphere():
 
 def cube():
     center = c.GRID_SIZE//2
-    volt = np.zeros((c.GRID_SIZE, c.GRID_SIZE, c.GRID_SIZE), dtype=int)
-    volt[center, center, center] = 1
+    volt = np.ones((c.GRID_SIZE, c.GRID_SIZE, c.GRID_SIZE), dtype=int)
+    volt[center, center, center] = 2
     return volt
 
 
