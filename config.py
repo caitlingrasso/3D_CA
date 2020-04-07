@@ -37,7 +37,8 @@ def sphere():
     body[:, length - 1, :] = 0
     body[:, :, 0] = 0
     body[:, :, length - 1] = 0
-    body[radius,radius,radius] = 2
+    # body[radius,radius,radius] = 2
+    body[radius, radius, 1] = np.random.randint(c.low, c.high)
     return body
 
 def cube():

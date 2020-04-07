@@ -1,5 +1,5 @@
 GRID_SIZE = 21
-CA_ITER = 100
+CA_ITER = 500
 
 pulse_time = 10  # pulse every 10 iterations
 
