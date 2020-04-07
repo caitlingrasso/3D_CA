@@ -43,7 +43,10 @@ def sphere():
 def cube():
     center = c.GRID_SIZE//2
     volt = np.ones((c.GRID_SIZE, c.GRID_SIZE, c.GRID_SIZE), dtype=int)
-    volt[center, center, center] = 2
+    # volt[center, center, center] = 2  # pacemaker in center
+    init_volt = np.random.randint(c.low, c.high)
+    volt[0,0,0] = init_volt  # pacemaker in upper left corner - starting on surface
+    print("Initial pacemaker voltage:", init_volt)
     return volt
 
 

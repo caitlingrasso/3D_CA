@@ -8,13 +8,16 @@ class CA:
 
     def __init__(self, signal):
         self.voltage = signal  # these are the counters
-        self.recharge = np.zeros(signal.shape)
+        self.recharge = np.zeros(signal.shape)  # increments every time step its on signal value is greater than 0... signal
+        # can only pass to cells with a recharge value of 0... once the recharge value of a cell hits the refactory
+        # period (constant) the value goes back to zero
 
         all_indices = np.indices(signal.shape)
-        x = all_indices[0][signal > 1]
-        y = all_indices[1][signal > 1]
-        z = all_indices[2][signal > 1]
+        x = all_indices[0][signal == 2]
+        y = all_indices[1][signal == 2]
+        z = all_indices[2][signal == 2]
         self.pacemaker = [x[0],y[0],z[0]]
+        self.recharge[self.pacemaker] = 1
 
     def get_neighbors(self, a):
         b = np.pad(a, pad_width=1, mode='constant', constant_values=0)
@@ -28,28 +31,25 @@ class CA:
         # Store a copy of the voltage map at the previous time step
         self.v_prev = self.voltage.copy()
 
+        # Signal dies for all cells that go over the max signal (max_signal determines how far the signal can propagate)
+        self.voltage[self.voltage > constants.max_signal] = 1
+
         # Getting the neighbors of all cells in the voltage map
         neigh = self.get_neighbors(self.voltage)
 
-        # Update the voltage map
-        #TODO: What if the pacemaker goes off but the neighbors are already propagating?
-        # Some random probability the signal dies earlier? -- might produce some interesting behavior
+        # Update the voltage map !!
         for x in range(self.voltage.shape[0]):
             for y in range(self.voltage.shape[1]):
                 for z in range(self.voltage.shape[2]):
-                    if self.recharge[x,y,z] > 0:
-                        self.recharge[x,y,z] -= 1
+                    if self.recharge[x,y,z] > constants.refactory_time:
+                        self.recharge[x, y, z] = 0
+                        self.voltage[x,y,z]=1
                     if self.recharge[x,y,z] == 0 and np.max(neigh[x,y,z,:]) > 1:  # cell takes the max value of its neighbors
-                        nbors = neigh[x, y, z, :]
-                        self.voltage[x,y,z] = np.min(nbors[nbors>1]) - 1  # pass the signal and decrement the value of the voltage by one (decay)
-        self.voltage[self.v_prev == 0] = 0
-
-        for x in range(self.voltage.shape[0]):
-            for y in range(self.voltage.shape[1]):
-                for z in range(self.voltage.shape[2]):
-                    if self.v_prev[x, y, z] > 1 and self.voltage[x,y,z] == 1:  # If a cell was signaling in the last time step and just "turned off"... start the recharge counter
-                        self.recharge[x, y, z] = constants.refractory_time
-
+                        self.voltage[x,y,z] = np.max(neigh[x,y,z,:]) + 1  # increment time the "trail" has been alive
+                    if (self.voltage[x, y, z] > 1):  # increment time cell has been "lit"
+                        self.recharge[x, y, z] += 1
+        self.voltage[self.v_prev==0] = 0
+        # print(self.voltage)
 
     def run(self, iterations=constants.CA_ITER, save=False, fn='temp.mp4', axis='off', title=''):
         if save:
@@ -70,13 +70,11 @@ class CA:
 
                 # Pulses
                 if i % constants.pulse_time == 0:
-                    self.voltage[self.pacemaker[0], self.pacemaker[1], self.pacemaker[2]] = np.random.randint(constants.low, constants.high)
+                    self.voltage[self.pacemaker[0], self.pacemaker[1], self.pacemaker[2]] = 2
+                    self.recharge[:,:,:]=0
 
                 cmap = plt.get_cmap('gray')
-                voltage_min = 1 #self.voltage_min -- should always be 1
-                # voltage_max = 100 if  self.voltage.max()<50 else self.voltage.max()
-                voltage_max = constants.high
-                norm = plt.Normalize(voltage_min, voltage_max)
+                norm = plt.Normalize(self.voltage.min(), self.voltage.max())
                 ax.voxels(temp, facecolors=cmap(norm(temp2)), edgecolor=None)
                 moviewriter.grab_frame()
                 self.update()
@@ -88,3 +86,14 @@ class CA:
         else:
             for _ in range(iterations):
                 self.update()
+
+    # def update_vectorized(self):
+    #     #TODO: fix!!
+    #
+    #     # self.voltage = self.voltage-1 + np.max(self.get_neighbors(self.voltage), axis=3)
+    #     all_indices = np.indices((constants.GRID_SIZE, constants.GRID_SIZE, constants.GRID_SIZE))
+    #     neigh = self.get_neighbors(self.voltage)
+    #     print(self.voltage)
+    #     self.voltage[all_indices[0][self.recharge==0], all_indices[1][self.recharge==0]] = \
+    #         np.max(neigh[all_indices[0][self.recharge==0], all_indices[1][self.recharge==0]], axis=2) + 1  # only is the max of the neighbors is not equal to 0
+    #     print(self.voltage)
