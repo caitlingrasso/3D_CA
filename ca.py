@@ -32,16 +32,17 @@ class CA:
         neigh = self.get_neighbors(self.voltage)
 
         # Update the voltage map
-        #TODO: What if the pacemaker goes off but the neighbors are already propagating?
-        # Some random probability the signal dies earlier? -- might produce some interesting behavior
         for x in range(self.voltage.shape[0]):
             for y in range(self.voltage.shape[1]):
                 for z in range(self.voltage.shape[2]):
+                    if self.voltage[x,y,z]>1:  # Signal within cell decays
+                        self.voltage[x,y,z] -= 1
                     if self.recharge[x,y,z] > 0:
                         self.recharge[x,y,z] -= 1
-                    if self.recharge[x,y,z] == 0 and np.max(neigh[x,y,z,:]) > 1:  # cell takes the max value of its neighbors
+                    if self.recharge[x,y,z] == 0 and np.max(neigh[x,y,z,:]) > self.voltage[x,y,z]:
                         nbors = neigh[x, y, z, :]
-                        self.voltage[x,y,z] = np.min(nbors[nbors>1]) - 1  # pass the signal and decrement the value of the voltage by one (decay)
+                        if len(nbors[nbors > 1])>0:
+                            self.voltage[x,y,z] = np.min(nbors[nbors>1]) - 1  # pass the signal and decrement the value of the voltage by one (decay)
         self.voltage[self.v_prev == 0] = 0
 
         for x in range(self.voltage.shape[0]):
